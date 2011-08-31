@@ -1,0 +1,8 @@
+homeSuccess:
+  customize:
+    testAct:
+      template: [ca,testAct]
+      parts: [communityHome]
+      target: [after]
+      is_component: true
+
