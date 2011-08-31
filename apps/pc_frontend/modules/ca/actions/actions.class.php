@@ -25,6 +25,8 @@ class caActions extends sfActions
           default:
             return $this->renderText(json_encode(array("result" => "error","message" => "INVALID FOREIGN_TABLE")));
         }
+        //FIXME バリデーション
+
         $obj->member_id = $this->getUser()->getMemberId();
         $obj->foreign_id = $r->getParameter("foreign_id");
         $obj->body = $r->getParameter("body");
@@ -43,13 +45,14 @@ class caActions extends sfActions
         }else{
          $tag = op_image_tag($image->getUri(), array('width' => 48, 'height' => 48));
         }
-        //sf_image_path
+        //FIXME 正しいsrcをセットする
         $tag = "http://www.tejimaya.com/wp-content/themes/tejimaya/img/index/tejima.jpg";
         $opt = array("image" => $tag);
         $arr = array_merge($opt,$m->toArray(),$obj->toArray());
         return $this->renderText(json_encode($arr));
       }else{
         //render error
+        //FIXME まずいエラーメッセージが流れないようにする
         return $this->renderText(json_encode(array("result" => "error","msg" => $msg)));
       }
     }

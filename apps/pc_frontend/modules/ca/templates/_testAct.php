@@ -1,5 +1,5 @@
 <?php use_javascript('http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.6.2.min.js') ?>
-<form method="POST" action="/pc_frontend_dev.php/ca/updateActivity">
+<form method="POST" action="">
   <textarea cols="50" rows="4" id="activity_body" ></textarea>
   <input value="community" type="hidden" name="foreign_table" id="foreign_table" />
   <input value="<?php echo $community_id;?>" type="hidden" name="foreign_id" id="foreign_id" />
@@ -11,10 +11,10 @@
      var postdata = { body: $("#activity_body").val(), foreign_table: $("#foreign_table").val(), foreign_id: $("#foreign_id").val()};
      $("#activity_body").val("");
      $.post(
-       "/ca/updateActivity",
+       "/ca/updateActivity", //FIXME symfonyスタイルのアクション指定に変更
         postdata,
-        function(msg){
-         al = createActivityLine($.parseJSON(msg));
+        function(data_json){
+         al = createActivityLine($.parseJSON(data_json));
          $("#activityBox_timeline").html(al.html() + $("#activityBox_timeline").html());
      });
    });
@@ -35,7 +35,7 @@ function createActivityLine(data){
 <?php $params = array(
   'activities' => $activities,
   //'gadget' => $gadget,
-  'gadget' => null,
+  'gadget' => null, //FIXME CHECK THIS
   'title' => __("SNS Member's %activity%", array(
     '%activity%' => $op_term['activity']->titleize()->pluralize()
   )),

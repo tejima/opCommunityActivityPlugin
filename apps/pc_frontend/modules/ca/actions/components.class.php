@@ -3,7 +3,7 @@
 class caComponents extends sfComponents
 {
   public function executeActivityBox(sfWebRequest $request)
-  {
+  {//FIXME 多分このメソッドは要らない
     $id = $request->getParameter('id', $this->getUser()->getMemberId());
     $this->activities = Doctrine::getTable('ActivityData')->getActivityList($id, null, $this->gadget->getConfig('row'));
     $this->member = Doctrine::getTable('Member')->find($id);
