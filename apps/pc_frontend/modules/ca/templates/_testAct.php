@@ -14,7 +14,9 @@
        "/ca/updateActivity", //FIXME symfonyスタイルのアクション指定に変更
         postdata,
         function(data_json){
-         al = createActivityLine($.parseJSON(data_json));
+         data = $.parseJSON(data_json);
+         //FIXME 返答データの検証
+         al = createActivityLine(data);
          $("#activityBox_timeline").html(al.html() + $("#activityBox_timeline").html());
      });
    });
