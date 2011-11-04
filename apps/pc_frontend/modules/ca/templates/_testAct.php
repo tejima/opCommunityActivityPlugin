@@ -6,6 +6,7 @@
   <div id="share" style="font-size: 150%;">共有する</div>
 </form>
 <script>
+
  $().ready(function(){
    $("div#share").click(function(){
      var postdata = { body: $("#activity_body").val(), foreign_table: $("#foreign_table").val(), foreign_id: $("#foreign_id").val()};
@@ -24,12 +25,46 @@
 function createActivityLine(data){
   template = $(".activity.sample").clone().removeClass("sample");
   template.find(".bodyText").text(data.body);
+  template.find(".box_memberImage img").attr("alt",data.name);
   template.find(".name a").text(data.name);
-  template.find(".name a").attr("href","/member/" + data.member_id);
+  template.find("a[href*='MEMBER_ID']").each(function(){
+    $(this).attr("href",$(this).attr("href").replace("MEMBER_ID",data.member_id));
+  });
   template.find("a img").attr("src",data.image);
+  member_id = $("#member_id_you").text();
+  
+  if(data.member_id == member_id){
+    //show delete block
+    template.find(".delete").css("display","block");
+  }else{
+    //do nothing
+  }
+  
   return template;
 }
 </script>
+<div style="display: none;" id="member_id_you"><?php echo $sf_user->getMemberId(); ?></div>
+<div style="display: none;">
+<li class="activity sample"> 
+<div class="box_memberImage"> 
+<p><a href="/member/MEMBER_ID"><img alt="MEMBER_NAME" src="/images/no_image.gif" height="48" width="48" /></a></p> 
+</div> 
+<div class="box_body"> 
+<p> 
+<span class="content"> 
+<strong class="name"><a href="/member/MEMBER_ID">MEMBER_NAME</a></strong> 
+<span class="bodyText">DUMMY</span> 
+</span> 
+<span class="info"> 
+<span class="time">5秒前</span> 
+</span> 
+</p> 
+<ul class="operation"> 
+<li class="delete" style="display: none;"><a title="Delete this activity" href="/member/deleteActivity/id/MEMBER_ID">削除する</a></li> 
+</ul> 
+</div> 
+</li> 
+</div>
 
 <?php $id = 'activityBox' ?>
 <?php $id .= isset($gadget) ? '_'.$gadget->getId() : '' ?>
@@ -49,31 +84,61 @@ function createActivityLine(data){
 
 <div class="box_list">
 <ol id="<?php echo $id ?>_timeline" class="activities">
+<?php use_helper('opActivity') ?>
 <?php foreach ($activities as $activity): ?>
-<?php include_partial('default/activityRecord', array('activity' => $activity)); ?>
+
+<li class="activity">
+<div class="box_memberImage">
+<p><?php echo link_to(op_image_tag_sf_image($activity->getMember()->getImageFileName(), array('alt' => sprintf('[%s]', $activity->getMember()), 'size' => '48x48')), '@obj_member_profile?id='.$activity->getMemberId()) ?></p>
+</div>
+<div class="box_body">
+<p>
+<span class="content">
+<strong class="name"><?php echo op_link_to_member($activity->getMember()) ?></strong>
+<span class="bodyText"><?php echo op_activity_body_filter($activity) ?></span>
+</span>
+<span class="info">
+<span class="time"><?php echo $time = op_format_activity_time(strtotime($activity->getCreatedAt())) ?>
+<?php if ($activity->getSource()): ?>
+ from <?php echo link_to_if($activity->getSourceUri(), $activity->getSource(), $activity->getSourceUri()) ?>
+<?php endif; ?>
+</span>
+<?php if ($activity->getPublicFlag() != ActivityDataTable::PUBLIC_FLAG_SNS): ?>
+<span class="public_flag"><?php echo __('Public flag') ?> : <?php echo $activity->getPublicFlagCaption() ?></span>
+<?php endif; ?>
+</span>
+</p>
+<?php
+$operationItems = array();
+if (!isset($isOperation) || $isOperation)
+{
+  if ($activity->getMemberId() == $sf_user->getMemberId())
+  {
+    $operationItems[] = array(
+      'class' => 'delete',
+      'body'  => link_to(__('Delete'), 'member/deleteActivity?id='.$activity->getId(), array('title' => __('Delete this activity of %time%', array('%time%' => $time)))),
+    );
+  }
+}
+?>
+<?php if (0 < count($operationItems)): ?>
+<ul class="operation">
+<?php
+foreach ($operationItems as $item)
+{
+  if (is_array($item) && isset($item['body']))
+  {
+    printf("<li%s>%s</li>\n", isset($item['class']) ? sprintf(' class="%s"', $item['class']) : '', $item['body']);
+  }
+}
+?>
+</ul>
+<?php endif; ?>
+</div>
+</li>
+
 <?php endforeach; ?>
 </ol>
 </div>
 <?php endif; ?>
 
-<div style="display: none;">
-<li class="activity sample"> 
-<div class="box_memberImage"> 
-<p><a href="/member/1"><img alt="[1-手嶋]" src="/images/no_image.gif" height="48" width="48" /></a></p> 
-</div> 
-<div class="box_body"> 
-<p> 
-<span class="content"> 
-<strong class="name"><a href="/member/1">DUMMY</a></strong> 
-<span class="bodyText">DUMMY</span> 
-</span> 
-<span class="info"> 
-<span class="time">たった今</span> 
-</span> 
-</p> 
-<ul class="operation"> 
-<li class="delete"><a title="Delete this activity of 3分前" href="/member/deleteActivity/id/27">削除する</a></li> 
-</ul> 
-</div> 
-</li> 
-</div>
