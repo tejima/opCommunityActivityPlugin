@@ -12,7 +12,7 @@
      var postdata = { body: $("#activity_body").val(), foreign_table: $("#foreign_table").val(), foreign_id: $("#foreign_id").val()};
      $("#activity_body").val("");
      $.post(
-       "../ca/updateActivity", //FIXME symfonyスタイルのアクション指定に変更
+       "<?php echo $baseUrl; ?>/ca/updateActivity", //FIXME symfonyスタイルのアクション指定に変更
         postdata,
         function(data_json){
          data = $.parseJSON(data_json);
