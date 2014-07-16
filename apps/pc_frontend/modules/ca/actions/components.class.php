@@ -13,6 +13,7 @@ class caComponents extends sfComponents
   public function executeTestAct(sfWebRequest $request)
   {
     $community_id = $request->getParameter("id");
+    $this->baseUrl = sfConfig::get('op_base_url');
     $this->community_id = $community_id;
     $this->activities = Doctrine_Query::create()->from("ActivityData ad")->where("ad.foreign_table = ?","community")->andWhere("ad.foreign_id = ?",$community_id)->limit(10)->orderBy("ad.created_at desc")->execute();
     //echo "DUMP";
